@@ -1,4 +1,5 @@
 import API from '@/apis/api';
+import { addLoadingHandler, removeLoadingHandler } from '@/apis/axios';
 import Modal from '@/components/Modal/Modal';
 import { INIT_CREATE_DASHBOARD } from '@/constants/InitialModalValues';
 import usePagination from '@/hooks/usePagination';
@@ -6,7 +7,7 @@ import { fontStyle } from '@/styles/fontStyle';
 import { onMobile, onTablet } from '@/styles/mediaQuery';
 import { COLORS } from '@/styles/palettes';
 import { DashboardType } from '@/types/apiType';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import DashBoardAddButton from '../common/Button/DashBoardAddButton';
 import DashBoardButton from '../common/Button/DashBoardButton';
@@ -37,6 +38,7 @@ function MyDashBoardButtonBox({ resetToFirst, refresh, refreshPaginationToggle }
   }) as usePaginationProps;
   const [isOpen, setIsOpen] = useState(false);
   const [values, setValues] = useState(INIT_CREATE_DASHBOARD);
+  const [isLoading, setIsLoading] = useState(false);
 
   const setModalValue = (values = INIT_CREATE_DASHBOARD) => {
     setValues(values); // value = modal에 입력된 input value들의 집합
@@ -48,6 +50,17 @@ function MyDashBoardButtonBox({ resetToFirst, refresh, refreshPaginationToggle }
     await API.dashboard.createDashboard({ title: values['대시보드 이름'], color: values.색상 });
     refresh();
   };
+
+  const handleLoading = (isLoad: boolean) => {
+    setIsLoading(isLoad);
+  };
+
+  useEffect(() => {
+    addLoadingHandler(handleLoading);
+    return () => {
+      removeLoadingHandler(handleLoading);
+    };
+  }, []);
 
   return (
     <div>
