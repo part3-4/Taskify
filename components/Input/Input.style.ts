@@ -28,8 +28,8 @@ export const StyledInput = styled.input<{ $error: boolean }>`
 
   &:disabled {
     color: ${COLORS.GRAY_9F};
-    border: 1px solid ${COLORS.GRAY_D9};
-    background: ${COLORS.WHITE_FF};
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
   }
 
   ${onMobile} {
