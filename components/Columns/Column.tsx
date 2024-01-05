@@ -7,7 +7,7 @@ import { fontStyle } from '@/styles/fontStyle';
 import { onMobile, onPc, onTablet } from '@/styles/mediaQuery';
 import { GetCardDetailsItem, GetColumnListProps } from '@/types/api';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import styled from 'styled-components';
 import CountChip from '../Chip/CountChip';
@@ -34,7 +34,7 @@ function Column({ title: defaultTitle, columnId, dashboardId, applyColumnDelete 
     cursorId: 0,
   });
   const [manageColModalVals, setManageColModalVals] = useState<typeof INIT_MANAGE_COLUMN>(INIT_MANAGE_COLUMN);
-
+  const cardContainerRef = useRef<HTMLDivElement>(null);
   const { refresh } = useRefresh();
 
   // 무한스크롤로 카드 리스트 가져오기
@@ -59,6 +59,12 @@ function Column({ title: defaultTitle, columnId, dashboardId, applyColumnDelete 
     const res = await API.cards.checkCardList({ columnId, size: 5 });
     setColumnCardList(res.cards);
     setCardListInfos({ ...cardListInfos, totalCount: res.totalCount, cursorId: Number(res.cursorId) });
+    if (hasMore === false) {
+      setHasMore((prev) => !prev);
+    }
+    if (cardContainerRef.current) {
+      cardContainerRef.current.scrollTop = 0;
+    }
   };
 
   const loadColunCardList = async () => {
@@ -85,7 +91,7 @@ function Column({ title: defaultTitle, columnId, dashboardId, applyColumnDelete 
 
   useEffect(() => {
     firstFetch();
-  }, [columnId]);
+  }, [columnId, refresh]);
 
   return (
     <>
@@ -131,7 +137,7 @@ function Column({ title: defaultTitle, columnId, dashboardId, applyColumnDelete 
         </StyledHeader>
         <StyledWrapper>
           <AddButton onClick={() => handleModalsOpen('createToDo')} />
-          <StyledDiv $length={columnCardList.length}>
+          <StyledDiv $length={columnCardList.length} ref={cardContainerRef}>
             <InfiniteScroll
               pageStart={0}
               loadMore={fetchHasMore}
